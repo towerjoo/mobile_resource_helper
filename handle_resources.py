@@ -14,7 +14,7 @@ Blog: http://towerjoo.github.com
 
 run *python handle_resources.py -h* to show the help
 
-sage: handle_resources.py [options]
+Usage: handle_resources.py [options]
 
 Options:
   -h, --help            show this help message and exit
