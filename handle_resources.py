@@ -67,14 +67,22 @@ class AndroidHelper(HelperBase):
                   ('drawable-xhdpi',1))
 
     def __init__(self):
+        print ""
+        print "#" * 50
         print "handling android resources ..."
+        print "#" * 50
+
 
 class iPhoneHelper(HelperBase):
     dpi_ratios = (('iphone',0.5),
                   ('iphone-retina',1))
 
     def __init__(self):
+        print ""
+        print "#" * 50
         print "handling iPhone resources ..."
+        print "#" * 50
+
 
     def output_name(self, name, ratio):
         prefix, suffix = name.split(".")
@@ -89,7 +97,10 @@ class iPadHelper(HelperBase):
                   ('ipad-retina',1))
 
     def __init__(self):
+        print ""
+        print "#" * 50
         print "handling iPad resources ..."
+        print "#" * 50
 
     def output_name(self, name, ratio):
         prefix, suffix = name.split(".")
