@@ -4,6 +4,29 @@
 """
 To help generate the resources to fit different resolution for iOS devices, 
 and Android Devices.
+
+## Credits
+
+Author: Zhu Tao<zhutao.iscas@gmail.com>
+Blog: http://towerjoo.github.com
+
+## How To Use
+
+run *python handle_resources.py -h* to show the help
+
+sage: handle_resources.py [options]
+
+Options:
+  -h, --help            show this help message and exit
+  -d RES_DIR, --dir=RES_DIR
+                        Directory of the original resources
+  -o OUTPUT, --output=OUTPUT
+                        output of the handled resources(current dir as
+                        default)
+  -p PLATFORM, --platform=PLATFORM
+                        platform to generate(android or iPhone or iPad, 'all'
+                        as default)
+
 """
 import sys, os
 import Image
