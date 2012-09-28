@@ -1,8 +1,8 @@
-mobile_resource_helper
+Mobile Resource Helper
 ======================
 
 
-![Logo](helper_logo.png)
+![Logo](https://raw.github.com/towerjoo/mobile_resource_helper/master/helper_logo.png)
 
 change resources to predefined DPIs automatically to ease the mobile development.
 
