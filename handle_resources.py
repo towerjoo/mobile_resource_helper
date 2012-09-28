@@ -35,6 +35,14 @@ class HelperBase(object):
     dpi_ratios = ()
     def __init__(self):
         self.warnings = []
+        self.initPlatform()
+        print ""
+        print "#" * 50
+        print "handling %s resources ..." % self.p
+        print "#" * 50
+
+    def initPlatform(self):
+        self.p = "base"
 
     def handle_resources(self, res_dir, output, ready_to_process):
         self.ready_to_process = ready_to_process
@@ -79,9 +87,14 @@ class HelperBase(object):
             if os.path.exists(self.output) and not os.path.exists(target_res_folder):
                 os.makedirs(target_res_folder)
             target_res_filename = os.path.join(target_res_folder, self.output_name(path.split(os.path.sep)[-1], dpi_ratio[1]))
-            img.thumbnail((int(target_width), int(target_height)), Image.ANTIALIAS)
-            print "%s is saved" % target_res_filename
-            img.save(target_res_filename)
+            tw, th = int(target_width), int(target_height)
+            if tw == 0 or th == 0:
+                print "The height or width for %s(%s) should be no less than 1px. Skip it!" % (path, dpi_ratio[0])
+                self.warnings.append("%s(%s)" % (path, dpi_ratio[0]))
+            else:
+                img.thumbnail((tw, th), Image.ANTIALIAS)
+                print "%s is saved" % target_res_filename
+                img.save(target_res_filename)
 
 class AndroidHelper(HelperBase):
     dpi_ratios = (('drawable-ldpi',0.325),
@@ -89,22 +102,16 @@ class AndroidHelper(HelperBase):
                   ('drawable-hdpi',0.75),
                   ('drawable-xhdpi',1))
 
-    def __init__(self):
-        print ""
-        print "#" * 50
-        print "handling android resources ..."
-        print "#" * 50
+    def initPlatform(self):
+        self.p = "android"
 
 
 class iPhoneHelper(HelperBase):
     dpi_ratios = (('iphone',0.5),
                   ('iphone-retina',1))
 
-    def __init__(self):
-        print ""
-        print "#" * 50
-        print "handling iPhone resources ..."
-        print "#" * 50
+    def initPlatform(self):
+        self.p = "iPhone"
 
 
     def output_name(self, name, ratio):
@@ -119,11 +126,8 @@ class iPadHelper(HelperBase):
     dpi_ratios = (('ipad',0.5),
                   ('ipad-retina',1))
 
-    def __init__(self):
-        print ""
-        print "#" * 50
-        print "handling iPad resources ..."
-        print "#" * 50
+    def initPlatform(self):
+        self.p = "iPad"
 
     def output_name(self, name, ratio):
         prefix, suffix = name.split(".")
@@ -164,6 +168,14 @@ def handle_args():
         elif platform == "iPad":
             a = iPadHelper()
             a.handle_resources(res_dir, output, platform)
+
+        if a.warnings:
+            print "*" * 50
+            print "WARNINGS:(height or width is less than 1px)"
+            print "\n".join(a.warnings)
+            print "*" * 50
+
+            
 
     
 if __name__ == "__main__":
