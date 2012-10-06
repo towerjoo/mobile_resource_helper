@@ -26,6 +26,7 @@ Options:
   -p PLATFORM, --platform=PLATFORM
                         platform to generate(android or iPhone or iPad, 'all'
                         as default)
+  -i, --parent          whether add the parent dirs(False as default)
 
 """
 import sys, os
@@ -44,10 +45,11 @@ class HelperBase(object):
     def initPlatform(self):
         self.p = "base"
 
-    def handle_resources(self, res_dir, output, ready_to_process):
+    def handle_resources(self, res_dir, output, ready_to_process, parent):
         self.ready_to_process = ready_to_process
         self.output = output
         self.res_dir = res_dir
+        self.parent = parent
         if not os.path.isdir(self.res_dir):
             print "The specified original resource directory is NOT a directory"
             return
@@ -83,18 +85,27 @@ class HelperBase(object):
             img = Image.open(path)
             target_width = img.size[0] * dpi_ratio[1]
             target_height = img.size[1] * dpi_ratio[1]
-            target_res_folder = os.path.join(self.output, dpi_ratio[0], os.path.dirname(path))
+
+            if self.parent:
+                target_res_folder = os.path.join(self.output, dpi_ratio[0], os.path.dirname(path))
+            else:
+                target_res_folder = os.path.join(self.output, dpi_ratio[0])
+
             if os.path.exists(self.output) and not os.path.exists(target_res_folder):
                 os.makedirs(target_res_folder)
             target_res_filename = os.path.join(target_res_folder, self.output_name(path.split(os.path.sep)[-1], dpi_ratio[1]))
+            if self.p == "android": target_res_filename = target_res_filename.replace("@2x", "")
             tw, th = int(target_width), int(target_height)
-            if tw == 0 or th == 0:
-                print "The height or width for %s(%s) should be no less than 1px. Skip it!" % (path, dpi_ratio[0])
+            if tw == 0 or th == 0: 
+                if tw == 0: 
+                    tw = 1
+                if th == 0:
+                    th = 1
+                print "The height or width for %s(%s) should be no less than 1px. Make it to 1px if less than 1px." % (path, dpi_ratio[0])
                 self.warnings.append("%s(%s)" % (path, dpi_ratio[0]))
-            else:
-                img.thumbnail((tw, th), Image.ANTIALIAS)
-                print "%s is saved" % target_res_filename
-                img.save(target_res_filename)
+            img.thumbnail((tw, th), Image.ANTIALIAS)
+            print "%s is saved" % target_res_filename
+            img.save(target_res_filename)
 
 class AndroidHelper(HelperBase):
     dpi_ratios = (('drawable-ldpi',0.325),
@@ -141,6 +152,7 @@ def handle_args():
     parser.add_option("-d", "--dir", dest="res_dir", help="Directory of the original resources")
     parser.add_option("-o", "--output", dest="output", help="output of the handled resources(current dir as default)", default=".")
     parser.add_option("-p", "--platform", dest="platform", help="platform to generate(android or iPhone or iPad, 'all' as default)", default="all")
+    parser.add_option("-i", "--parent", dest="parent", help="whether add the parent dirs(False as default)", action="store_true", default=False)
 
     (options, args) = parser.parse_args()
     if options.res_dir is None:
@@ -152,26 +164,27 @@ def handle_args():
         output = options.output
         platform = options.platform
         ready_to_process = True
+        parent = options.parent
         if platform == "all":
             a = AndroidHelper()
-            a.handle_resources(res_dir, output, platform)
+            a.handle_resources(res_dir, output, platform, parent)
             a = iPhoneHelper()
-            a.handle_resources(res_dir, output, platform)
+            a.handle_resources(res_dir, output, platform, parent)
             a = iPadHelper()
-            a.handle_resources(res_dir, output, platform)
+            a.handle_resources(res_dir, output, platform, parent)
         elif platform == "android":
             a = AndroidHelper()
-            a.handle_resources(res_dir, output, platform)
+            a.handle_resources(res_dir, output, platform, parent)
         elif platform == "iPhone":
             a = iPhoneHelper()
-            a.handle_resources(res_dir, output, platform)
+            a.handle_resources(res_dir, output, platform, parent)
         elif platform == "iPad":
             a = iPadHelper()
-            a.handle_resources(res_dir, output, platform)
+            a.handle_resources(res_dir, output, platform, parent)
 
         if a.warnings:
             print "*" * 50
-            print "WARNINGS:(height or width is less than 1px)"
+            print "WARNINGS:(height or width is less than 1px, use 1px instead)"
             print "\n".join(a.warnings)
             print "*" * 50
 
