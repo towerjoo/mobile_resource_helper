@@ -99,8 +99,8 @@ def do_process(res_dir, config):
     num = len(files)
 
     cols = DEFAUlT_CANVAS_WIDTH / ITEM_WIDTH
-    if DEFAUlT_CANVAS_WIDTH % ITEM_WIDTH != 0:
-        cols += 1
+    #if DEFAUlT_CANVAS_WIDTH % ITEM_WIDTH != 0:
+    #    cols += 1
     rows = num / cols
     if num % cols != 0:
         rows += 1
